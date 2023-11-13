@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=2eefaed6-430a-4c39-9893-1e5360a2e123&lang=ru_RU"></script>
+    <title>Task 17</title>
+</head>
+
+<body>
+    <input type="text" id="suggest" placeholder="Введите адрес">
+    <select id="suggest-select"></select>
+    <script>
+        window.onload = function () {
+            const input = document.getElementById('suggest');
+            const select = document.getElementById('suggest-select');
+            ymaps.ready(() => {
+                // Дебоунсинг для сокращения количества запросов на сервер и защита от троттлинга, реализованные с помощью замыканий
+                (function () {
+                    let timeout;
+                    return () => {
+                        input.addEventListener('input', () => {
+                            clearTimeout(timeout);
+                            select.innerHTML = '';
+                            timeout = setTimeout(() => {
+                                ymaps.geocode(input.value)
+                                    .then(res => {
+                                        if (res.geoObjects.getLength() < 1) {
+                                            const option = document.createElement('option');
+                                            option.textContent = 'Нет подходящих результатов';
+                                            select.append(option);
+                                        } else {
+                                            res.geoObjects.each((item) => {
+                                                const option = document.createElement('option');
+                                                option.textContent = item.getAddressLine();
+                                                select.append(option);
+                                            })
+                                        }
+                                    })
+                            }, 1000);
+                        });
+                    }
+                }()());
+            });
+        }
+        // Для корректной работы в настройках JavaScript API и HTTP Геокодер в ограничении по HTTP Referer установлен localhost, 
+        // т.е. локально приложение запускается только на http://localhost:<номер порта>/17/
+    </script>
+</body>
+
+</html>

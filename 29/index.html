@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task 26</title>
+  <style>
+    form {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      width: 500px;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    button {
+      width: 150px;
+    }
+  </style>
+</head>
+
+<body>
+  <form>
+    <label for="name">Ваше имя:</label>
+    <input type="text" id="name" name="name" placeholder="Введите ваше имя">
+    <label for="date">Дата рождения:</label>
+    <input type="date" id="date" name="date" />
+    <label for="comment">Комментарий:</label>
+    <textarea id="comment" name="comment"></textarea>
+    <button type="submit">Отправить данные</button>
+  </form>
+  <div class="post-results"></div>
+  <script>
+    const form = document.querySelector('form');
+    function manageForm(form) { // Функция, которая получает данные из формы на странице и отправляет их на сервер
+      const submitBtn = form.querySelector('[type="submit"]');
+      submitBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(form); // Получаем данные из формы
+        const data = JSON.stringify(Object.fromEntries(formData)); // Переводим данные в формат объекта, потом трансформируем его в JSON
+        let response = await fetch('https://httpbin.org/post', { // Тестовый сервер для примера
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json;charset=utf-8'
+          },
+          body: data
+        });
+
+        let result = await response.json();
+        let status = await response.status;
+        console.log('Ответ с сервера:', result); // Выводим в консоль ответ с сервера
+        const renderResults = document.querySelector('.post-results');
+        // На странице отображаем данные, которые были отправлены
+        renderResults.textContent = `
+          Статус ответа: ${status}; отправленные данные: ${data} 
+        `;
+      });
+    }
+    manageForm(form);
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task 18</title>
+</head>
+
+<body>
+    <div>
+        Размер localStorage: <span id="size">...</span> Кб.
+    </div>
+    <script>
+        // Функция, которая находит размер localStorage 
+        function getSize(num) {
+            return new Array((num * 1024) + 1).join('a')
+        }
+
+        if (!localStorage.getItem('size')) { // Если размер localStorage еще не вычислен
+            var i = 0;
+            try { // Через цикл заполняем localStorage
+                for (i = 0; i <= 10000; i += 250) {
+                    localStorage.setItem('maxSize', getSize(i));
+                }
+            } catch (e) { // Когда происходит ошибка переполнения, записываем в localStorage размер
+                localStorage.removeItem('maxSize');
+                localStorage.setItem('size', i ? i - 250 : 0);
+            }
+        }
+
+        // Когда загрузка страницы завершена, в элемент size записывается размер localStorage
+        window.onload = () => {
+            const sizeElement = document.getElementById('size');
+            sizeElement.innerHTML = localStorage.getItem('size');
+        }
+        // Результат для Google Chrome: 
+        // Размер localStorage: 5000 Кб.
+    </script>
+</body>
+
+</html>
